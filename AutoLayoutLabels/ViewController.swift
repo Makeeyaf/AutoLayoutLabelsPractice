@@ -143,8 +143,8 @@ class ViewController: UIViewController {
     // MARK: Methods
 
     private func changeText() {
-        titleTextIndex = (titleTextIndex < testTitleTexts.count) ? titleTextIndex + 1 : 0
-        subtitleTextIndex = (subtitleTextIndex < testSubtitleTexts.count) ? subtitleTextIndex + 1 : 0
+        titleTextIndex = (titleTextIndex < testTitleTexts.count - 1) ? titleTextIndex + 1 : 0
+        subtitleTextIndex = (subtitleTextIndex < testSubtitleTexts.count - 1) ? subtitleTextIndex + 1 : 0
 
         [manualLabelView, autoLabelView].forEach {
             $0.titleLabel.text = testTitleTexts[titleTextIndex]
