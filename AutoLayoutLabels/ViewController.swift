@@ -9,62 +9,70 @@ import UIKit
 
 import SnapKit
 
+struct TestLabelViewData: LabelViewData {
+    var titleLabelData: LabelData
+    var subtitleLabelData: LabelData
+}
+
 class ViewController: UIViewController {
-    var manualHeightConstraint: Constraint?
-    var manualWidthConstraint: Constraint?
-    var autoWidthConstraint: Constraint?
+    var widthConstraint: Constraint?
 
-    var titleTextIndex: Int = 0
-    var subtitleTextIndex: Int = 0
+    var textIndex: Int = 0
 
-    let testTitleTexts: [String] = [
-        "미스터 켄트 백의 77가지 구현 패턴",
-        "최신 선물을 구할 수 있는 마지막 기회.",
-        "새로운 파워. 어마무시한 가능성 👍",
-        "사운드 문제에 대한 AirPods Pro 서비스 프로그램",
-    ]
-
-    let testSubtitleTexts: [String] = [
-        "읽기 쉬운 코드를 작성하는 77가지 자바 코딩 비법",
-        "쇼핑 중에는 언제든지 스페셜리스트의 도움을 받을 수도 있죠.",
-        "데스크탑의 능력을 완전히 새로운 차원으로 끌어올려줍니다.",
-        "사운드 문제가 발생할 수 있음을 확인했습니다. 🤷‍♂️",
+    let testTexts: [TestLabelViewData] = [
+        TestLabelViewData(
+            titleLabelData: LabelData(
+                text: "미스터 켄트 백의 77가지 구현 패턴",
+                font: .systemFont(ofSize: 16, weight: .semibold),
+                textColor: .black
+            ),
+            subtitleLabelData: LabelData(
+                text: "읽기 쉬운 코드를 작성하는 77가지 자바 코딩 비법",
+                font: .systemFont(ofSize: 14, weight: .regular),
+                textColor: .gray
+            )
+        ),
+        TestLabelViewData(
+            titleLabelData: LabelData(
+                text: "최신 선물을 구할 수 있는 마지막 기회.",
+                font: UIFont(name: "AppleSDGothicNeo-SemiBold", size: 16)!,
+                textColor: .black
+            ),
+            subtitleLabelData: LabelData(
+                text: "쇼핑 중에는 언제든지 스페셜리스트의 도움을 받을 수도 있죠.",
+                font: UIFont(name: "AppleSDGothicNeo-Regular", size: 14)!,
+                textColor: .gray
+            )
+        ),
+        TestLabelViewData(
+            titleLabelData: LabelData(
+                text: "새로운 파워. 어마무시한 가능성 👍",
+                font: .systemFont(ofSize: 16, weight: .semibold),
+                textColor: .black
+            ),
+            subtitleLabelData: LabelData(
+                text: "데스크탑의 능력을 완전히 새로운 차원으로 끌어올려줍니다.",
+                font: .systemFont(ofSize: 14, weight: .regular),
+                textColor: .gray
+            )
+        ),
+        TestLabelViewData(
+            titleLabelData: LabelData(
+                text: "사운드 문제에 대한 AirPods Pro 서비스 프로그램",
+                font: UIFont(name: "AppleSDGothicNeo-SemiBold", size: 10)!,
+                textColor: .black
+            ),
+            subtitleLabelData: LabelData(
+                text: "사운드 문제가 발생할 수 있음을 확인했습니다. 🤷‍♂️",
+                font: UIFont(name: "AppleSDGothicNeo-Regular", size: 18)!,
+                textColor: .gray
+            )
+        ),
     ]
 
     // MARK: Views
 
-    lazy var manualLabelView: LabelView = {
-        let view = LabelView()
-        view.titleLabel.text = testTitleTexts[titleTextIndex]
-        view.subtitleLabel.text = testSubtitleTexts[subtitleTextIndex]
-        return view
-    }()
-
-    lazy var autoLabelView: LabelView = {
-        let view = LabelView()
-        view.titleLabel.text = testTitleTexts[titleTextIndex]
-        view.subtitleLabel.text = testSubtitleTexts[subtitleTextIndex]
-        return view
-    }()
-
-    lazy var heightSlider: UISlider = {
-        let view = UISlider()
-        view.isContinuous = true
-        view.maximumValue = 100
-        view.minimumValue = 0
-        view.value = 100
-        view.addTarget(self, action: #selector(heightSliderDidChange), for: .valueChanged)
-        return view
-    }()
-
-    lazy var heightSliderLabel = UILabel()
-
-    lazy var heightStack: UIStackView = {
-        let view = UIStackView(arrangedSubviews: [heightSliderLabel, heightSlider])
-        view.axis = .horizontal
-        view.spacing = 10
-        return view
-    }()
+    lazy var labelView = LabelView()
 
     lazy var widthSlider: UISlider = {
         let view = UISlider()
@@ -98,36 +106,20 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         addViews()
         setConstraints()
+        labelView.render(with: testTexts[textIndex])
     }
 
     private func addViews() {
-        [manualLabelView, autoLabelView, heightStack, widthStack, changeTextButton].forEach {
+        [labelView, widthStack, changeTextButton].forEach {
             view.addSubview($0)
         }
     }
 
     private func setConstraints() {
-        manualLabelView.snp.makeConstraints {
+        labelView.snp.makeConstraints {
             $0.center.equalToSuperview()
-            manualWidthConstraint = $0.width.equalTo(0).constraint
-            manualHeightConstraint = $0.height.lessThanOrEqualTo(0).constraint
-            manualWidthConstraint?.update(offset: widthSlider.value)
-            manualHeightConstraint?.update(offset: heightSlider.value)
-        }
-
-        autoLabelView.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.top.equalTo(manualLabelView.snp.bottom).offset(30)
-            autoWidthConstraint = $0.width.equalTo(0).constraint
-            autoWidthConstraint?.update(offset: widthSlider.value)
-            let titleHeight: CGFloat = autoLabelView.titleLabel.font.lineHeight
-            let subtitleHeight: CGFloat = autoLabelView.subtitleLabel.font.lineHeight
-
-            $0.height.lessThanOrEqualTo(2 * titleHeight + subtitleHeight)
-        }
-
-        heightStack.snp.makeConstraints {
-            $0.leading.top.trailing.equalTo(view.layoutMarginsGuide)
+            widthConstraint = $0.width.equalTo(0).constraint
+            widthConstraint?.update(offset: widthSlider.value)
         }
 
         widthStack.snp.makeConstraints {
@@ -136,33 +128,23 @@ class ViewController: UIViewController {
 
         changeTextButton.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(manualLabelView.snp.top).offset(-30)
+            $0.bottom.equalTo(labelView.snp.top).offset(-30)
         }
     }
 
     // MARK: Methods
 
     private func changeText() {
-        titleTextIndex = (titleTextIndex < testTitleTexts.count - 1) ? titleTextIndex + 1 : 0
-        subtitleTextIndex = (subtitleTextIndex < testSubtitleTexts.count - 1) ? subtitleTextIndex + 1 : 0
+        textIndex = (textIndex < testTexts.count - 1) ? textIndex + 1 : 0
 
-        [manualLabelView, autoLabelView].forEach {
-            $0.titleLabel.text = testTitleTexts[titleTextIndex]
-            $0.subtitleLabel.text = testSubtitleTexts[subtitleTextIndex]
-        }
+        labelView.render(with: testTexts[textIndex])
     }
 
     // MARK: Actions
 
-    @objc private func heightSliderDidChange() {
-        heightSliderLabel.text = "\(Int(heightSlider.value))"
-        manualHeightConstraint?.update(offset: heightSlider.value)
-    }
-
     @objc private func widthSliderDidChange() {
         widthSliderLabel.text = "\(Int(widthSlider.value))"
-        manualWidthConstraint?.update(offset: widthSlider.value)
-        autoWidthConstraint?.update(offset: widthSlider.value)
+        widthConstraint?.update(offset: widthSlider.value)
     }
 
     @objc private func changeTextButtonDidTapped() {
