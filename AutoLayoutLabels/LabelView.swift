@@ -67,7 +67,7 @@ class LabelView: UIView {
 
     private func setConstraints() {
         titleLabel.setContentHuggingPriority(.required, for: .vertical)
-        subtitleLabel.setContentHuggingPriority(.required, for: .vertical)
+        subtitleLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
         labelStack.snp.makeConstraints {
             $0.edges.equalToSuperview()
             heightConstraint = $0.height.lessThanOrEqualTo(0).constraint
