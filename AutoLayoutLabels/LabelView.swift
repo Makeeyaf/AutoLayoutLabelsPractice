@@ -9,29 +9,38 @@ import UIKit
 
 import SnapKit
 
+struct LabelData {
+    var text: String?
+    var font: UIFont
+    var textColor: UIColor
+}
+
+protocol LabelViewData {
+    var titleLabelData: LabelData { get }
+    var subtitleLabelData: LabelData { get }
+}
+
 class LabelView: UIView {
+
+    var heightConstraint: Constraint?
 
     // MARK: Views
 
-    lazy var titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let view = UILabel()
         view.numberOfLines = 2
-        view.font = .systemFont(ofSize: 16, weight: .semibold)
-        view.textColor = .darkText
-        view.backgroundColor = UIColor.green.withAlphaComponent(0.1)
+        view.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.1)
         return view
     }()
 
-    lazy var subtitleLabel: UILabel = {
+    private lazy var subtitleLabel: UILabel = {
         let view = UILabel()
         view.numberOfLines = 2
-        view.font = .systemFont(ofSize: 13, weight: .regular)
-        view.textColor = .lightGray
-        view.backgroundColor = UIColor.red.withAlphaComponent(0.1)
+        view.backgroundColor = UIColor.systemYellow.withAlphaComponent(0.1)
         return view
     }()
 
-    lazy var labelStack: UIStackView = {
+    private lazy var labelStack: UIStackView = {
         let view = UIStackView(arrangedSubviews: [
             titleLabel,
             subtitleLabel,
@@ -61,6 +70,24 @@ class LabelView: UIView {
         subtitleLabel.setContentHuggingPriority(.required, for: .vertical)
         labelStack.snp.makeConstraints {
             $0.edges.equalToSuperview()
+            heightConstraint = $0.height.lessThanOrEqualTo(0).constraint
         }
+    }
+
+    func render(with data: LabelViewData) {
+        titleLabel.text = data.titleLabelData.text
+        titleLabel.font = data.titleLabelData.font
+        titleLabel.textColor = data.titleLabelData.textColor
+
+        subtitleLabel.text = data.subtitleLabelData.text
+        subtitleLabel.font = data.subtitleLabelData.font
+        subtitleLabel.textColor = data.subtitleLabelData.textColor
+
+        let t = titleLabel.font.lineHeight
+        let s = subtitleLabel.font.lineHeight
+
+        let offset = max(2 * t + s, t + 2 * s)
+
+        heightConstraint?.update(offset: offset)
     }
 }
