@@ -21,8 +21,22 @@ protocol LabelViewData {
 }
 
 class LabelView: UIView {
-
     var heightConstraint: Constraint?
+
+    var spacing: CGFloat {
+        get { labelStack.spacing }
+        set {
+            labelStack.spacing = newValue
+            heightConstraint?.update(offset: labelOffset + newValue)
+        }
+    }
+
+    private var labelOffset: CGFloat {
+        let t = titleLabel.font.lineHeight
+        let s = subtitleLabel.font.lineHeight
+
+        return max(2 * t + s, t + 2 * s)
+    }
 
     // MARK: Views
 
@@ -68,6 +82,8 @@ class LabelView: UIView {
     private func setConstraints() {
         titleLabel.setContentHuggingPriority(.required, for: .vertical)
         subtitleLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        labelStack.setContentCompressionResistancePriority(.required, for: .vertical)
+        labelStack.setContentHuggingPriority(.required, for: .vertical)
         labelStack.snp.makeConstraints {
             $0.edges.equalToSuperview()
             heightConstraint = $0.height.lessThanOrEqualTo(0).constraint
@@ -83,11 +99,6 @@ class LabelView: UIView {
         subtitleLabel.font = data.subtitleLabelData.font
         subtitleLabel.textColor = data.subtitleLabelData.textColor
 
-        let t = titleLabel.font.lineHeight
-        let s = subtitleLabel.font.lineHeight
-
-        let offset = max(2 * t + s, t + 2 * s)
-
-        heightConstraint?.update(offset: offset)
+        heightConstraint?.update(offset: labelOffset + spacing)
     }
 }

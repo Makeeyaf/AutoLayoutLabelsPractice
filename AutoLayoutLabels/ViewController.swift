@@ -72,7 +72,11 @@ class ViewController: UIViewController {
 
     // MARK: Views
 
-    lazy var labelView = LabelView()
+    lazy var labelView: LabelView = {
+        let view = LabelView()
+        view.spacing = 2
+        return view
+    }()
 
     lazy var widthSlider: UISlider = {
         let view = UISlider()
